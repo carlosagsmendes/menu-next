@@ -7,6 +7,7 @@ import { connection } from "next/server";
 export const SIMULATED_PAGE_LOAD_MS = 150;
 
 export async function simulatePageLoad(): Promise<void> {
+  if (process.env.NODE_ENV === "production") return;
   await connection();
   await new Promise<void>((resolve) => {
     setTimeout(resolve, SIMULATED_PAGE_LOAD_MS);
