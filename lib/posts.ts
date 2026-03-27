@@ -2,15 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { connection } from "next/server";
 
-export type Post = {
-  id: string;
-  title: string;
-  excerpt: string;
-  author: string;
-  date: string;
-  readTime: string;
-  category: string;
-};
+import type { Post } from "@/data/dto";
+export type { Post } from "@/data/dto";
 
 const AUTHORS = [
   "Alice Chen",
@@ -105,10 +98,8 @@ const MOCK_POSTS: Post[] = Array.from({ length: TOTAL_POSTS }, (_, i) => {
   };
 });
 
-export type PostsPage = {
-  posts: Post[];
-  nextCursor: number | null;
-};
+import type { PostsPage } from "@/data/dto";
+export type { PostsPage } from "@/data/dto";
 
 const DEFAULT_PAGE_SIZE = 20;
 

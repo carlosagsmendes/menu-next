@@ -1,11 +1,7 @@
 "use server";
 
-export type SearchResult = {
-  id: string;
-  title: string;
-  description: string;
-  href: string;
-};
+import type { SearchResult } from "@/data/dto";
+export type { SearchResult } from "@/data/dto";
 
 const SEARCHABLE_ITEMS: SearchResult[] = [
   {

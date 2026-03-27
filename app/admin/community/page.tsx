@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import { forbidden } from "next/navigation";
-import { getCommunityAdminAllowed } from "@/lib/permissions";
+import { verifyPermission } from "@/data/auth";
 import { DelayedContent } from "@/components/DelayedContent";
 import { PageLoadingFallback } from "@/components/PageLoadingFallback";
 
@@ -10,8 +9,7 @@ export const metadata = {
 };
 
 export default async function CommunityAdminPage() {
-  const allowed = await getCommunityAdminAllowed();
-  if (!allowed) forbidden();
+  await verifyPermission("community:admin");
 
   return (
     <div className="flex flex-1 flex-col p-8">

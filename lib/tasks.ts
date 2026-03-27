@@ -2,11 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { connection } from "next/server";
 
-export type Task = {
-  id: string;
-  title: string;
-  status: "pending" | "done";
-};
+import type { Task } from "@/data/dto";
+export type { Task } from "@/data/dto";
 
 const MOCK_TASKS: Task[] = [
   { id: "1", title: "Review community guidelines", status: "pending" },
