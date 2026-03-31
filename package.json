@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "perf:build": "tsx perf/build.ts",
+    "perf:load": "tsx perf/run-load.ts",
+    "perf:client": "tsx perf/run-client.ts",
+    "perf:compare": "tsx perf/compare.ts",
+    "perf:all": "tsx perf/run-all.ts",
+    "perf:memory": "tsx perf/run-memory.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.37",
@@ -28,13 +34,21 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@opentelemetry/instrumentation-http": "^0.214.0",
+    "@opentelemetry/instrumentation-undici": "^0.24.0",
+    "@opentelemetry/resources": "^2.6.1",
+    "@opentelemetry/sdk-node": "^0.214.0",
+    "@opentelemetry/sdk-trace-base": "^2.6.1",
+    "@opentelemetry/semantic-conventions": "^1.40.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
+    "playwright": "^1.58.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

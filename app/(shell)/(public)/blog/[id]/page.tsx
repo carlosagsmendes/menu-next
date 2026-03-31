@@ -7,6 +7,7 @@ import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import { CommentsShell } from "@/components/blog/CommentsShell";
 import { CommentsClientOnly } from "@/components/blog/CommentsClientOnly";
 import { getPost, getRelatedPosts } from "@/lib/posts";
+import { startBenchmarkRequest } from "@/lib/perf/request-metrics";
 
 function RelatedPostsSkeleton() {
   return (
@@ -78,7 +79,12 @@ export default async function BlogPostPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const benchmarkRequest = startBenchmarkRequest({
+    routeLabel: "/blog/[id]",
+    phase: "page",
+  });
   const { id } = await params;
+  benchmarkRequest.update({ entityId: id });
 
   // Kick off both fetches in parallel
   const postPromise = getPost(id);
@@ -88,11 +94,17 @@ export default async function BlogPostPage({
   const post = await postPromise;
 
   if (!post) {
+    benchmarkRequest.markOutcome("not-found");
     notFound();
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 p-8">
+    <div
+      className="mx-auto max-w-3xl space-y-8 p-8"
+      data-perf-page="blog-detail"
+      data-perf-post-id={id}
+      data-perf-route-mode="partial-prerender"
+    >
       {/* ── Pattern 1: Pure server-side (awaited, no client JS) ── */}
       <PostContent post={post} />
 

@@ -20,6 +20,9 @@ export function SideNav() {
             <Link href="/blog" className={linkClass}>
               Blog
             </Link>
+            <Link href="/blog-no-streaming" className={linkClass}>
+              Blog No Streaming
+            </Link>
             <Link href="/editor" className={linkClass}>
               Editor
             </Link>

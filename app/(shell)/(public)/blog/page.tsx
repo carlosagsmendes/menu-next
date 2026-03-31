@@ -4,6 +4,7 @@ import { getPostsPage } from "@/lib/posts";
 import { Providers } from "@/components/Providers";
 import { BlogPostList } from "@/components/BlogPostList";
 import { BlogPostListSkeleton } from "@/components/BlogPostListSkeleton";
+import { startBenchmarkRequest } from "@/lib/perf/request-metrics";
 import { makeQueryClient } from "@/lib/query-client";
 import { postsQueryKey } from "@/lib/posts-query";
 
@@ -31,8 +32,17 @@ async function PrefetchedBlogPostList() {
 }
 
 export default function BlogPage() {
+  startBenchmarkRequest({
+    routeLabel: "/blog",
+    phase: "page",
+  });
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col p-8 pb-0">
+    <div
+      className="flex min-h-0 flex-1 flex-col p-8 pb-0"
+      data-perf-page="blog-list"
+      data-perf-route-mode="partial-prerender"
+    >
       <h1 className="shrink-0 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
         Blog
       </h1>
