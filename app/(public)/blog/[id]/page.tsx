@@ -101,13 +101,15 @@ export default async function BlogPostPage({
         <RelatedPosts relatedPostsPromise={relatedPostsPromise} />
       </Suspense>
 
+      {/* ── Pattern 2: React Query + Suspense (server-prefetched) ── */}
       <Providers>
-        {/* ── Pattern 2: React Query + Suspense (server-prefetched) ── */}
         <Suspense fallback={<CommentsSkeleton />}>
           <CommentsShell postId={id} />
         </Suspense>
+      </Providers>
 
-        {/* ── Pattern 3: React Query client-only (no server prefetch) ── */}
+      {/* ── Pattern 3: React Query client-only (no server prefetch) ── */}
+      <Providers>
         <CommentsClientOnly postId={id} />
       </Providers>
     </div>
