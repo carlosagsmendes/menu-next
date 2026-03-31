@@ -2,8 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { connection } from "next/server";
 
-import type { Post } from "@/data/dto";
-export type { Post } from "@/data/dto";
+import type { Post, PostDetail, Comment, CommentSort, NewCommentInput } from "@/data/dto";
+export type { Post, PostDetail, Comment, CommentSort } from "@/data/dto";
 
 const AUTHORS = [
   "Alice Chen",
@@ -116,3 +116,114 @@ export const getPostsPage = cache(
     return { posts, nextCursor };
   },
 );
+
+// ---------------------------------------------------------------------------
+// Post detail (full article content)
+// ---------------------------------------------------------------------------
+
+const CONTENT_PARAGRAPHS = [
+  "The landscape of web development continues to shift beneath our feet. What was considered best practice a year ago may now be an anti-pattern. This article explores the current state of the art and what we've learned from running these patterns in production.",
+  "We started by questioning our assumptions. Every architectural decision was re-evaluated against real-world performance data, developer experience metrics, and user feedback. The results were often surprising—some of our most beloved abstractions were actually hurting us.",
+  "The key insight was that simplicity compounds. Each layer of abstraction we removed made the next optimization easier to find. We went from a complex microservice mesh to a streamlined set of server components that could be reasoned about locally.",
+  "Testing played a crucial role in giving us confidence to make these changes. We invested heavily in integration tests that exercised real data paths rather than mocking everything. This caught subtle issues that unit tests would have missed entirely.",
+  "Performance monitoring told the rest of the story. We instrumented every boundary—server to client, component to component, cache hit to cache miss. The data revealed bottlenecks we never would have found through code review alone.",
+  "Looking ahead, we see these patterns becoming the default rather than the exception. The tools are maturing, the community is sharing real production data, and the frameworks are making the right thing the easy thing.",
+];
+
+function getPostContent(id: string): string[] {
+  const seed = Number(id);
+  const count = 3 + (seed % 4);
+  return Array.from({ length: count }, (_, i) => CONTENT_PARAGRAPHS[(seed + i) % CONTENT_PARAGRAPHS.length]);
+}
+
+export const getPost = cache(async (id: string): Promise<PostDetail | undefined> => {
+  await connection();
+  await new Promise<void>((r) => setTimeout(r, 200));
+
+  const post = MOCK_POSTS.find((p) => p.id === id);
+  if (!post) return undefined;
+
+  return { ...post, content: getPostContent(id) };
+});
+
+// ---------------------------------------------------------------------------
+// Related posts (slow—demonstrates streaming with Suspense)
+// ---------------------------------------------------------------------------
+
+export const getRelatedPosts = cache(async (id: string): Promise<Post[]> => {
+  await connection();
+  await new Promise<void>((r) => setTimeout(r, 1500));
+
+  const post = MOCK_POSTS.find((p) => p.id === id);
+  if (!post) return [];
+
+  return MOCK_POSTS
+    .filter((p) => p.id !== id && p.category === post.category)
+    .slice(0, 3);
+});
+
+// ---------------------------------------------------------------------------
+// Comments
+// ---------------------------------------------------------------------------
+
+const COMMENT_AUTHORS = ["Elena", "Marco", "Yuki", "Sam", "Priya", "Jordan"];
+const COMMENT_BODIES = [
+  "Great write-up! This matches what we've seen in our own production systems.",
+  "I've been waiting for someone to cover this topic with real data. Thanks for sharing.",
+  "We tried a similar approach last quarter and ran into edge cases. Would love to hear how you handled caching invalidation.",
+  "This is exactly the kind of deep dive the community needs. Bookmarked.",
+  "Interesting perspective. I wonder how this scales with larger teams and more complex data models.",
+  "We adopted this pattern six months ago and haven't looked back. The developer experience improvement alone was worth it.",
+  "The performance numbers are impressive. Did you measure the impact on Core Web Vitals as well?",
+  "Solid article. One thing I'd add is the importance of monitoring at the edge—it changes the debugging story entirely.",
+];
+
+const commentsStore: Record<string, Comment[]> = {};
+
+function getOrCreateComments(postId: string): Comment[] {
+  if (!commentsStore[postId]) {
+    const seed = Number(postId) || 0;
+    const count = 2 + (seed % 4);
+    commentsStore[postId] = Array.from({ length: count }, (_, i) => ({
+      id: `c-${postId}-${i}`,
+      author: COMMENT_AUTHORS[(seed + i) % COMMENT_AUTHORS.length],
+      body: COMMENT_BODIES[(seed + i) % COMMENT_BODIES.length],
+      createdAt: new Date(2026, 2, 25 - i * 3).toISOString(),
+    }));
+  }
+  return commentsStore[postId];
+}
+
+function sortComments(comments: Comment[], sort: CommentSort): Comment[] {
+  return [...comments].sort((a, b) => {
+    const diff = Date.parse(b.createdAt) - Date.parse(a.createdAt);
+    return sort === "oldest" ? -diff : diff;
+  });
+}
+
+export async function getCommentsServer(
+  postId: string,
+  sort: CommentSort = "newest",
+): Promise<Comment[]> {
+  await new Promise<void>((r) => setTimeout(r, 1200));
+  return sortComments(getOrCreateComments(postId), sort);
+}
+
+export async function createCommentServer(
+  postId: string,
+  input: NewCommentInput,
+): Promise<Comment> {
+  await new Promise<void>((r) => setTimeout(r, 300));
+
+  const comment: Comment = {
+    id: crypto.randomUUID(),
+    author: input.author,
+    body: input.body,
+    createdAt: new Date().toISOString(),
+  };
+
+  const current = getOrCreateComments(postId);
+  commentsStore[postId] = [comment, ...current];
+
+  return comment;
+}

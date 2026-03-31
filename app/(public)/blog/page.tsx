@@ -1,12 +1,11 @@
 import { Suspense } from "react";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getPostsPage } from "@/lib/posts";
+import { Providers } from "@/components/Providers";
 import { BlogPostList } from "@/components/BlogPostList";
 import { BlogPostListSkeleton } from "@/components/BlogPostListSkeleton";
+import { makeQueryClient } from "@/lib/query-client";
+import { postsQueryKey } from "@/lib/posts-query";
 
 export const metadata = {
   title: "Blog",
@@ -14,18 +13,20 @@ export const metadata = {
 };
 
 async function PrefetchedBlogPostList() {
-  const queryClient = new QueryClient();
+  const queryClient = makeQueryClient();
 
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts"],
+    queryKey: postsQueryKey,
     queryFn: ({ pageParam }) => getPostsPage(pageParam),
     initialPageParam: 0,
   });
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <BlogPostList />
-    </HydrationBoundary>
+    <Providers>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <BlogPostList />
+      </HydrationBoundary>
+    </Providers>
   );
 }
 

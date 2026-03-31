@@ -3,7 +3,6 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { SideNav } from "@/components/SideNav";
 import { Toolbar } from "@/components/Toolbar";
-import { Providers } from "@/components/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,16 +20,14 @@ export default function RootLayout({
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >
-        <body className="flex h-full flex-col">
-        <Providers>
-          <Toolbar />
-          <div className="flex min-h-0 flex-1">
-            <SideNav />
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-              {children}
-            </div>
+      <body className="flex h-full flex-col bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+        <Toolbar />
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+          <SideNav />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            {children}
           </div>
-        </Providers>
+        </div>
       </body>
     </html>
   );

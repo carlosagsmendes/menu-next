@@ -1,9 +1,11 @@
 "use client";
 
 import { useRef, useEffect, useMemo } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { fetchPostsPageAction } from "@/lib/actions";
+import { postsQueryKey } from "@/lib/posts-query";
 
 const CATEGORY_COLORS: Record<string, string> = {
   Engineering:
@@ -32,18 +34,19 @@ export function BlogPostList() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["posts"],
+  } = useSuspenseInfiniteQuery({
+    queryKey: postsQueryKey,
     queryFn: ({ pageParam }) => fetchPostsPageAction(pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 
   const allPosts = useMemo(
-    () => data?.pages.flatMap((page) => page.posts) ?? [],
+    () => data.pages.flatMap((page) => page.posts),
     [data],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- opted out of memoization; TanStack Virtual returns unstable refs by design
   const virtualizer = useVirtualizer({
     count: hasNextPage ? allPosts.length + 1 : allPosts.length,
     getScrollElement: () => parentRef.current,
@@ -101,7 +104,9 @@ export function BlogPostList() {
                     </span>
                   </div>
                   <h2 className="mt-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                    {post.title}
+                    <Link href={`/blog/${post.id}`} className="hover:underline">
+                      {post.title}
+                    </Link>
                   </h2>
                   <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                     {post.excerpt}
