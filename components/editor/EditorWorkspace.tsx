@@ -546,7 +546,11 @@ function EditorSurface({
   );
 }
 
-export function EditorWorkspace() {
+export function EditorWorkspace({
+  nonce,
+}: {
+  nonce?: string;
+}) {
   const [seedState] = useState(createInitialEditorWorkspaceState);
   const [document, setDocument] = useState(seedState.draft.document);
   const [frozenSnapshot, setFrozenSnapshot] = useState(seedState.frozenSnapshot);
@@ -567,10 +571,11 @@ export function EditorWorkspace() {
         },
       },
       extensions: createEditorExtensions(),
+      injectNonce: nonce,
       immediatelyRender: false,
       shouldRerenderOnTransaction: false,
     },
-    []
+    [nonce]
   );
 
   const locked = frozenSnapshot.snapshot !== null;

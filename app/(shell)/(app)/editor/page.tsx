@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { EditorWorkspaceGate } from "@/components/editor/EditorWorkspaceGate";
 
 export const metadata: Metadata = {
@@ -6,7 +7,16 @@ export const metadata: Metadata = {
   description: "TipTap proofreading editor workspace.",
 };
 
-export default function EditorPage() {
+function extractNonce(contentSecurityPolicy: string | null) {
+  return contentSecurityPolicy?.match(/'nonce-([^']+)'/)?.[1];
+}
+
+export default async function EditorPage() {
+  const requestHeaders = await headers();
+  const nonce =
+    requestHeaders.get("x-nonce") ||
+    extractNonce(requestHeaders.get("content-security-policy"));
+
   return (
     <div className="flex min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-[linear-gradient(180deg,rgba(250,250,250,0.96),rgba(244,244,245,0.88))] px-4 py-5 sm:px-6 lg:px-8 dark:bg-[linear-gradient(180deg,rgba(9,9,11,0.98),rgba(9,9,11,0.94))]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
@@ -42,7 +52,7 @@ export default function EditorPage() {
           </div>
         </header>
 
-        <EditorWorkspaceGate />
+        <EditorWorkspaceGate nonce={nonce} />
       </div>
     </div>
   );

@@ -28,6 +28,10 @@ const EditorWorkspace = dynamic(
   }
 );
 
-export function EditorWorkspaceGate() {
-  return <EditorWorkspace />;
+export function EditorWorkspaceGate({
+  nonce,
+}: {
+  nonce?: string;
+}) {
+  return <EditorWorkspace nonce={nonce} />;
 }
