@@ -2,8 +2,15 @@ import "server-only";
 import { cache } from "react";
 import { connection } from "next/server";
 
-import type { Post, PostDetail, Comment, CommentSort, NewCommentInput } from "@/data/dto";
-export type { Post, PostDetail, Comment, CommentSort } from "@/data/dto";
+import type {
+  Comment,
+  CommentSort,
+  NewCommentInput,
+  Post,
+  PostDetail,
+  PostsPage,
+} from "@/data/dto";
+export type { Post, PostDetail, Comment, CommentSort, PostsPage } from "@/data/dto";
 
 const AUTHORS = [
   "Alice Chen",
@@ -98,8 +105,25 @@ const MOCK_POSTS: Post[] = Array.from({ length: TOTAL_POSTS }, (_, i) => {
   };
 });
 
-import type { PostsPage } from "@/data/dto";
-export type { PostsPage } from "@/data/dto";
+const POST_IDS = new Set(MOCK_POSTS.map((post) => post.id));
+const likesStore: Record<string, number> = {};
+
+function hasPost(postId: string): boolean {
+  return POST_IDS.has(postId);
+}
+
+function getInitialLikes(postId: string): number {
+  const seed = Number(postId) || 0;
+  return 10 + ((seed * 7) % 41);
+}
+
+function getCurrentLikes(postId: string): number {
+  if (likesStore[postId] === undefined) {
+    likesStore[postId] = getInitialLikes(postId);
+  }
+
+  return likesStore[postId];
+}
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -143,8 +167,32 @@ export const getPost = cache(async (id: string): Promise<PostDetail | undefined>
   const post = MOCK_POSTS.find((p) => p.id === id);
   if (!post) return undefined;
 
-  return { ...post, content: getPostContent(id) };
+  return { ...post, content: getPostContent(id), likes: getCurrentLikes(id) };
 });
+
+export async function getPostLikes(postId: string): Promise<number | undefined> {
+  await connection();
+
+  if (!hasPost(postId)) {
+    return undefined;
+  }
+
+  return getCurrentLikes(postId);
+}
+
+export async function applyPostLikesDelta(
+  postId: string,
+  delta: number,
+): Promise<number> {
+  await connection();
+
+  if (!hasPost(postId)) {
+    throw new Error("Post not found");
+  }
+
+  likesStore[postId] = getCurrentLikes(postId) + delta;
+  return likesStore[postId];
+}
 
 // ---------------------------------------------------------------------------
 // Related posts (slow—demonstrates streaming with Suspense)

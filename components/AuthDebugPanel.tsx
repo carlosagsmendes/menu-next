@@ -1,12 +1,8 @@
+import { Suspense } from "react";
 import { headers } from "next/headers";
 import { AUTH_HEADERS, getAuthenticatedUser } from "@/data/auth";
 
-/**
- * Server component that displays proxy + render auth diagnostics.
- * Consumes `getAuthenticatedUser()` (React.cache) so placing this alongside
- * another caller proves render-tree deduplication.
- */
-export async function AuthDebugPanel() {
+async function AuthDebugPanel() {
   const [h, renderResult] = await Promise.all([
     headers(),
     getAuthenticatedUser(),
@@ -23,7 +19,6 @@ export async function AuthDebugPanel() {
         Auth Debug Panel
       </p>
 
-      {/* User profile */}
       <div className="mb-4 rounded-lg border border-indigo-100 bg-white p-3 dark:border-indigo-900 dark:bg-indigo-950/60">
         <p className="mb-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">
           Authenticated User
@@ -42,7 +37,6 @@ export async function AuthDebugPanel() {
         </dl>
       </div>
 
-      {/* Proxy diagnostics */}
       <div className="mb-3 rounded-lg border border-indigo-100 bg-white p-3 dark:border-indigo-900 dark:bg-indigo-950/60">
         <p className="mb-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">
           Proxy Lookup
@@ -61,7 +55,6 @@ export async function AuthDebugPanel() {
         )}
       </div>
 
-      {/* Render diagnostics */}
       <div className="rounded-lg border border-indigo-100 bg-white p-3 dark:border-indigo-900 dark:bg-indigo-950/60">
         <p className="mb-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">
           Render Lookup (React.cache)
@@ -79,11 +72,7 @@ export async function AuthDebugPanel() {
   );
 }
 
-/**
- * A second consumer of `getAuthenticatedUser()` — renders the same render
- * lookupId, proving React.cache deduped within this request.
- */
-export async function AuthDedupeProof() {
+async function AuthDedupeProof() {
   const renderResult = await getAuthenticatedUser();
 
   return (
@@ -101,5 +90,15 @@ export async function AuthDedupeProof() {
         If this matches the panel above, React.cache deduped the backend lookup.
       </p>
     </div>
+  );
+}
+
+/** Composite of both auth debug components with their shared Suspense boundary. */
+export function AuthDiagnostics() {
+  return (
+    <Suspense fallback={null}>
+      <AuthDebugPanel />
+      <AuthDedupeProof />
+    </Suspense>
   );
 }

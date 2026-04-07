@@ -4,7 +4,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Providers } from "@/components/Providers";
 import { BlogPostList } from "@/components/BlogPostList";
 import { BlogPostListSkeleton } from "@/components/BlogPostListSkeleton";
-import { AuthDebugPanel, AuthDedupeProof } from "@/components/AuthDebugPanel";
+import { AuthDiagnostics } from "@/components/AuthDebugPanel";
 import { getPostsPage } from "@/lib/posts";
 import { startBenchmarkRequest } from "@/lib/perf/request-metrics";
 import { postsQueryKey } from "@/lib/posts-query";
@@ -52,10 +52,7 @@ export default function ContextPage() {
         Server Components and streaming experiments live here.
       </p>
       <div className="mt-6 grid gap-4">
-        <Suspense fallback={null}>
-          <AuthDebugPanel />
-          <AuthDedupeProof />
-        </Suspense>
+        <AuthDiagnostics />
       </div>
       <div className="mt-6 flex min-h-0 flex-1 flex-col">
         <Suspense fallback={<BlogPostListSkeleton />}>

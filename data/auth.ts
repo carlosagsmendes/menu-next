@@ -69,9 +69,7 @@ const MOCK_USER: AuthenticatedUser = {
 export async function lookupAuthenticatedUser(
   source: "proxy" | "render",
 ): Promise<AuthLookupResult> {
-  await connection();
   const start = performance.now();
-  // Simulate 15-30 ms backend latency
   await new Promise((r) => setTimeout(r, 15 + Math.random() * 15));
   return {
     user: MOCK_USER,
@@ -84,7 +82,9 @@ export async function lookupAuthenticatedUser(
 /**
  * Render-tree helper — `React.cache` ensures a single lookup per request
  * no matter how many server components call it in the same render pass.
+ * Calls `connection()` to opt out of static prerendering.
  */
-export const getAuthenticatedUser = cache(
-  () => lookupAuthenticatedUser("render"),
-);
+export const getAuthenticatedUser = cache(async () => {
+  await connection();
+  return lookupAuthenticatedUser("render");
+});

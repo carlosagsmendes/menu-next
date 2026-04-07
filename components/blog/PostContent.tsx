@@ -1,5 +1,6 @@
 import type { PostDetail } from "@/data/dto";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 const CATEGORY_COLORS: Record<string, string> = {
   Engineering: "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
@@ -16,10 +17,12 @@ export function PostContent({
   post,
   backHref = "/blog",
   backLabel = "Back to blog",
+  titleAccessory,
 }: {
   post: PostDetail;
   backHref?: string;
   backLabel?: string;
+  titleAccessory?: ReactNode;
 }) {
   return (
     <article>
@@ -41,9 +44,14 @@ export function PostContent({
         </span>
       </div>
 
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        {post.title}
-      </h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+          {post.title}
+        </h1>
+        {titleAccessory ? (
+          <div className="shrink-0 sm:max-w-xs">{titleAccessory}</div>
+        ) : null}
+      </div>
 
       <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
         {post.author} &middot; {post.date}

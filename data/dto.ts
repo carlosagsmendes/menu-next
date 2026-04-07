@@ -28,6 +28,7 @@ export type SearchResult = {
 
 export type PostDetail = Post & {
   content: string[];
+  likes: number;
 };
 
 export type Comment = {
