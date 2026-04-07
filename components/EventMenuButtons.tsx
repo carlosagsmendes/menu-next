@@ -19,6 +19,11 @@ const eventButtons: Array<{
     description: "Point the sidebar at the blog section without navigating away.",
   },
   {
+    id: "context",
+    label: "Highlight Context",
+    description: "Preview the new streaming experiments route in the sidebar.",
+  },
+  {
     id: "blogNoStreaming",
     label: "Highlight Blog No Streaming",
     description: "Simulate an aggregate page that belongs to the blocking shell flow.",

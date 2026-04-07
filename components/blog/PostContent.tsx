@@ -12,14 +12,22 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Open Source": "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
 };
 
-export function PostContent({ post }: { post: PostDetail }) {
+export function PostContent({
+  post,
+  backHref = "/blog",
+  backLabel = "Back to blog",
+}: {
+  post: PostDetail;
+  backHref?: string;
+  backLabel?: string;
+}) {
   return (
     <article>
       <Link
-        href="/blog"
+        href={backHref}
         className="mb-4 inline-flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
       >
-        &larr; Back to blog
+        &larr; {backLabel}
       </Link>
 
       <div className="mb-4 flex items-center gap-3">

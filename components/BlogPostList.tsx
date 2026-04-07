@@ -26,7 +26,11 @@ const CATEGORY_COLORS: Record<string, string> = {
     "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
 };
 
-export function BlogPostList() {
+export function BlogPostList({
+  detailHrefBase = "/blog",
+}: {
+  detailHrefBase?: string;
+}) {
   const parentRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -104,7 +108,10 @@ export function BlogPostList() {
                     </span>
                   </div>
                   <h2 className="mt-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                    <Link href={`/blog/${post.id}`} className="hover:underline">
+                    <Link
+                      href={`${detailHrefBase}/${post.id}`}
+                      className="hover:underline"
+                    >
                       {post.title}
                     </Link>
                   </h2>

@@ -3,8 +3,10 @@ import Link from "next/link";
 
 export async function RelatedPosts({
   relatedPostsPromise,
+  detailHrefBase = "/blog",
 }: {
   relatedPostsPromise: Promise<Post[]>;
+  detailHrefBase?: string;
 }) {
   const relatedPosts = await relatedPostsPromise;
 
@@ -23,7 +25,7 @@ export async function RelatedPosts({
         {relatedPosts.map((post) => (
           <li key={post.id}>
             <Link
-              href={`/blog/${post.id}`}
+              href={`${detailHrefBase}/${post.id}`}
               className="block rounded-lg border border-zinc-100 p-4 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50"
             >
               <p className="font-medium text-zinc-900 dark:text-zinc-50">

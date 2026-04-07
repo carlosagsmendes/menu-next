@@ -1,6 +1,7 @@
 export type MenuItemId =
   | "home"
   | "blog"
+  | "context"
   | "blogNoStreaming"
   | "editor"
   | "events"
@@ -27,6 +28,12 @@ export const PUBLIC_SIDE_NAV_ITEMS = [
     id: "blog",
     href: "/blog",
     label: "Blog",
+    matchMode: "section",
+  },
+  {
+    id: "context",
+    href: "/context",
+    label: "Context",
     matchMode: "section",
   },
   {
