@@ -1,3 +1,4 @@
+import { CurrentUserBadge } from "@/components/CurrentUserBadge";
 import { TaskCount } from "@/components/TaskCount";
 import { SearchBox } from "@/components/SearchBox";
 
@@ -14,6 +15,7 @@ export function Toolbar() {
           </p>
         </div>
         <div className="flex min-w-0 items-center gap-3">
+          <CurrentUserBadge />
           <TaskCount />
           <SearchBox />
         </div>
